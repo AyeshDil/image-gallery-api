@@ -1,9 +1,13 @@
 package com.imagegallery.imagegalleryapi.controller;
 
 import com.imagegallery.imagegalleryapi.dto.request.UserRequestDTO;
+import com.imagegallery.imagegalleryapi.dto.response.CommonResponseDTO;
 import com.imagegallery.imagegalleryapi.dto.response.UserResponseDTO;
 import com.imagegallery.imagegalleryapi.service.UserService;
+import com.imagegallery.imagegalleryapi.util.StandardResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,16 +23,31 @@ public class UserController {
     }
 
     @PostMapping(path = "/save")
-    public String RegUser(@RequestBody UserRequestDTO userRequestDTO){
-        return userService.saveUser(userRequestDTO);
+    public ResponseEntity<StandardResponse> RegUser(@RequestBody UserRequestDTO userRequestDTO) {
+        CommonResponseDTO commonResponseDTO = userService.saveUser(userRequestDTO);
+
+        return new ResponseEntity<>(
+                new StandardResponse(
+                        commonResponseDTO.getCode(),
+                        commonResponseDTO.getMessage(),
+                        commonResponseDTO.getData()
+                ), HttpStatus.CREATED
+        );
+
     }
 
     @GetMapping(path = "/get", params = {"email", "password"})
-    public UserResponseDTO getUser(
+    public ResponseEntity<StandardResponse> getUser(
             @RequestParam(value = "email") String email,
             @RequestParam(value = "password") String password
-    ){
-        UserResponseDTO userResponseDTO = userService.getUserDetails(email, password);
-        return userResponseDTO;
+    ) {
+        CommonResponseDTO commonResponseDTO = userService.getUserDetails(email, password);
+        return new ResponseEntity<>(
+                new StandardResponse(
+                        commonResponseDTO.getCode(),
+                        commonResponseDTO.getMessage(),
+                        commonResponseDTO.getData()
+                ), HttpStatus.OK
+        );
     }
 }
